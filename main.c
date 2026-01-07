@@ -3,7 +3,7 @@
 File: GREENEYE MAIN
 Author: Sara Berarducci
 Date: 01/07/2026
-Description: Main logic flow for greeneye's functionality.
+Description: Plant-monitoring embedded systems project
 
 Last updated: 1/07/2026
 
