@@ -1,9 +1,9 @@
 /*
 ----------------------------------------------------
-File: TEMPLATE
+File: GREENEYE MAIN
 Author: Sara Berarducci
 Date: 01/07/2026
-Description: TEMPLATE - scans i2c bus, then blinks on-board LED indefinitely
+Description: Main logic flow for greeneye's functionality.
 
 Last updated: 1/07/2026
 
