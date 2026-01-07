@@ -1,0 +1,20 @@
+{
+  "version": 3,
+  "configurePresets": [
+    {
+      "name": "pico",
+      "displayName": "Pico (Ninja + arm-none-eabi)",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "PICO_SDK_PATH": "/Users/saraberarducci/pico/pico-sdk",
+        "PICO_BOARD": "pico_w",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_C_COMPILER": "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi-gcc",
+        "CMAKE_CXX_COMPILER": "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi-g++",
+        "CMAKE_ASM_COMPILER": "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin/arm-none-eabi-gcc",
+        "PICO_TOOLCHAIN_PATH": "/Applications/ArmGNUToolchain/15.2.rel1/arm-none-eabi/bin"
+      }
+    }
+  ]
+}
