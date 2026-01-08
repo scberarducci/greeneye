@@ -25,12 +25,24 @@ REMINDERS:
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
 
+//drivers and custom modules
+#include "i2c_bus.h"
+
 //default i2c settings
 #define I2C_PORT i2c0
 #define SDA_PIN  4
 #define SCL_PIN  5
 
+//i2c addresses
 #define AHT20_ADDR 0x38
+
+//initialize i2c bus
+static const i2c_bus_t BUS0 = {
+    .port = I2C_PORT,
+    .sda_pin = SDA_PIN,
+    .scl_pin = SCL_PIN,
+    .freq_hz = 100 * 1000
+};
 
 void i2c_scan(){
     printf("Starting i2c scan.");
@@ -39,7 +51,7 @@ void i2c_scan(){
     //ret = common practice shorthand in c for "returned value"
     for (uint8_t addr = 0x08; addr <= 0x77; addr++) { 
         uint8_t dummy; //empty integer that takes up 8 bits of memory
-        int ret = i2c_read_blocking(I2C_PORT, addr, &dummy, 1, false); //read returned value into the dummy's memory location
+        int ret = i2c_read_blocking(BUS0.port, addr, &dummy, 1, false); //read returned value into the dummy's memory location
         if (ret >= 0) {
             printf("\nFound device at 0x%02X\n", addr);
         }
@@ -53,11 +65,7 @@ int main() {
     stdio_init_all();
     sleep_ms(2000);
 
-    i2c_init(I2C_PORT, 100 * 1000); // 100kHz
-    gpio_set_function(SDA_PIN, GPIO_FUNC_I2C);
-    gpio_set_function(SCL_PIN, GPIO_FUNC_I2C);
-    gpio_pull_up(SDA_PIN);
-    gpio_pull_up(SCL_PIN);
+    i2c_bus_init(&BUS0);
 
     if (cyw43_arch_init() != 0) {
         // WiFi chip init failed -> LED control won't work
@@ -94,6 +102,22 @@ int main() {
         if (data[0] & 0x80) {
             printf("busy\n");
         }
+
+        uint32_t raw_h =
+            ((uint32_t)data[1] << 12) |
+            ((uint32_t)data[2] << 4)  |
+            ((data[3] >> 4) & 0x0F);
+        
+        float humidity = (raw_h * 100.0f) / 1048576.0f; //given by aht20 datasheet
+
+        uint32_t raw_t =
+            ((uint32_t)(data[3] & 0x0F) << 16) |
+            ((uint32_t)data[4] << 8) |
+            (uint32_t)data[5];
+
+        float temperature = (raw_t * 200.0f) / 1048576.0f - 50.0f; //given by aht20 datasheet
+
+        printf("Temp: %.1f C   RH: %.1f %%\n", temperature, humidity);
 
         sleep_ms(1000);
     }

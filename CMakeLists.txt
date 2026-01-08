@@ -16,6 +16,8 @@ set(TARGET_NAME ${PROJ_NAME})
 
 add_executable(${TARGET_NAME}
     main.c
+    i2c_bus.c
+    aht20.c
 )
 
 target_link_libraries(${TARGET_NAME} 
