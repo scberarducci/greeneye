@@ -16,14 +16,20 @@ set(TARGET_NAME ${PROJ_NAME})
 
 add_executable(${TARGET_NAME}
     main.c
-    i2c_bus.c
-    aht20.c
+    i2c/i2c_bus.c
+    i2c/sensors/aht20/aht20.c
 )
 
 target_link_libraries(${TARGET_NAME} 
     pico_stdlib 
     pico_cyw43_arch_none
     hardware_i2c
+)
+
+target_include_directories(${TARGET_NAME} PRIVATE
+    ${CMAKE_CURRENT_LIST_DIR}/i2c
+    ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/aht20
+    ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/veml7700
 )
 
 pico_enable_stdio_usb(${TARGET_NAME} 1)
