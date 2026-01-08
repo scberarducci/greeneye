@@ -30,6 +30,8 @@ REMINDERS:
 #define SDA_PIN  4
 #define SCL_PIN  5
 
+#define AHT20_ADDR 0x38
+
 void i2c_scan(){
     printf("Starting i2c scan.");
 
@@ -61,17 +63,38 @@ int main() {
         // WiFi chip init failed -> LED control won't work
         while (true) {
             sleep_ms(1000);
-            printf("error");
+            printf("wifi chip not initialized");
         }
     }
 
     i2c_scan();
 
     while (true) {
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 1);
-        sleep_ms(500);
-        cyw43_arch_gpio_put(CYW43_WL_GPIO_LED_PIN, 0);
-        sleep_ms(500);
-        printf("beep\n");
+        uint8_t aht20_trigger[3] = {0xAC, 0x33, 0x00};
+        int write = i2c_write_blocking(I2C_PORT, AHT20_ADDR,aht20_trigger,3,false);
+        if(write != 3){
+            printf("command failed");
+            sleep_ms(1000);
+            continue;
+        }
+
+        sleep_ms(80); //gives sensor time to read environment
+
+        uint8_t data[6] = {0};
+        int read = i2c_read_blocking(I2C_PORT, AHT20_ADDR, data, 6, false);
+        if (read != 6){
+            printf("unable to read from device");
+            sleep_ms(1000);
+            continue;
+        }
+
+        printf("raw: %02X %02X %02X %02X %02X %02X\n",
+           data[0], data[1], data[2], data[3], data[4], data[5]);
+
+        if (data[0] & 0x80) {
+            printf("busy\n");
+        }
+
+        sleep_ms(1000);
     }
 }
