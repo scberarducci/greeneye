@@ -10,3 +10,5 @@ typedef struct {
 } i2c_bus_t;
 
 void i2c_bus_init(const i2c_bus_t *bus);
+
+int i2c_bus_scan();
