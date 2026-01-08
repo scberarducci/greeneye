@@ -29,6 +29,7 @@ REMINDERS:
 //drivers and custom modules
 #include "i2c_bus.h"
 #include "aht20.h"
+#include "veml7700.h"
 
 //default i2c settings
 #define I2C_PORT i2c0
@@ -48,6 +49,7 @@ static const i2c_bus_t BUS0 = {
 
 //declare sensors
 aht20_t aht;
+veml7700_t veml;
 
 int main() {
     stdio_init_all();
@@ -58,8 +60,12 @@ int main() {
     int num_devices = i2c_bus_scan(&BUS0); //make sure there's devices on the bus
     if(num_devices == 0){printf("No devices found"); exit(1);}
 
-    //init sensors
+    //init/config sensors
     aht20_init(&aht, BUS0.port);
+    veml7700_init(&veml, BUS0.port);
+    if(!veml7700_config(&veml, GAIN_1x, ITIME_100MS)){
+        printf("VEML7700 config failed");
+    }
 
     if (cyw43_arch_init() != 0) {
         // WiFi chip init failed -> LED control won't work
@@ -68,6 +74,25 @@ int main() {
     }
 
     while (true) {
+        //------- VEML7700 TEST CODE --------
+
+        uint16_t raw_counts;
+        if(veml7700_read_counts(&veml, &raw_counts)){
+            printf("\nRaw: %u", raw_counts);
+        }
+        else{
+            printf("\nVEML7700 read failed");
+        }
+
+        sleep_ms(1000);
+
+        //-----------------------------------
+
+
+
+        /*
+        //--------- AHT20 TEST CODE ---------
+
         float temp, humidity;
 
         if (aht20_read(&aht, &temp, &humidity)) {
@@ -77,5 +102,8 @@ int main() {
         }
 
         sleep_ms(1000);
+
+        //-----------------------------------
+        */
     }
 }

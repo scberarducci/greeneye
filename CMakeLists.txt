@@ -18,6 +18,7 @@ add_executable(${TARGET_NAME}
     main.c
     i2c/i2c_bus.c
     i2c/sensors/aht20/aht20.c
+    i2c/sensors/veml7700/veml7700.c
 )
 
 target_link_libraries(${TARGET_NAME} 
