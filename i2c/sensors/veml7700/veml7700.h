@@ -19,12 +19,17 @@ typedef enum{ //integration time
     ITIME_800MS = 800
 } veml7700_itime_t;
 
-typedef struct {
+typedef struct { //veml struct
     i2c_inst_t *port;
     uint8_t addr;
     veml7700_gain_t gain;
     veml7700_itime_t itime_ms;
 } veml7700_t;
+
+typedef struct { //holds gain and integration time
+    veml7700_gain_t gain;
+    veml7700_itime_t itime_ms;
+} veml7700_mode_t;
 
 //initialize veml port and address
 void veml7700_init(veml7700_t *dev, i2c_inst_t *port);
@@ -38,6 +43,12 @@ static float veml7700_lux_per_count(const veml7700_t *dev);
 //reads raw data from sensor
 bool veml7700_read_counts(const veml7700_t *dev, uint16_t *counts);
 
-//reads and returns lux using internal helper functions; update gain and integration time settings based on reading
-bool veml7700_read_lux_autorange(const veml7700_t *dev, float *lux);
+//reads and outputs lux using internal helper functions
+bool veml7700_read_lux(const veml7700_t *dev, float *lux);
+
+//helper function; updates gain and integration time settings for maximum accuracy
+static bool veml7700_autorange_update(veml7700_t *dev, uint16_t counts);
+
+//adjusts gain and integration time settings based on read lux
+bool veml7700_read_lux_autorange(veml7700_t *dev, float *lux);
 

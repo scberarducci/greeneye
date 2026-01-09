@@ -81,7 +81,15 @@ int main() {
             printf("\nRaw: %u", raw_counts);
         }
         else{
-            printf("\nVEML7700 read failed");
+            printf("\nVEML7700 count read failed");
+        }
+
+        float lux;
+        if(veml7700_read_lux_autorange(&veml, &lux)){
+            printf("\nLux: %f", lux);
+        }
+        else{
+            printf("\nVEML7700 lux read failed");
         }
 
         sleep_ms(1000);
