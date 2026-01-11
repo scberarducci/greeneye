@@ -14,11 +14,14 @@ pico_sdk_init()
 
 set(TARGET_NAME ${PROJ_NAME})
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_executable(${TARGET_NAME}
     main.c
     i2c/i2c_bus.c
     i2c/sensors/aht20/aht20.c
     i2c/sensors/veml7700/veml7700.c
+    i2c/ssd1306/ssd1306.c
 )
 
 target_link_libraries(${TARGET_NAME} 
@@ -31,6 +34,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/i2c
     ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/aht20
     ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/veml7700
+    ${CMAKE_CURRENT_LIST_DIR}/i2c/ssd1306
 )
 
 pico_enable_stdio_usb(${TARGET_NAME} 1)

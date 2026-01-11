@@ -1,7 +1,6 @@
 #include "veml7700.h"
 #include "hardware/i2c.h" //for i2c implementation
 #include "pico/stdlib.h" //for timing
-#include <stdio.h> //DEBUG ONLY
 
 #define VEML7700_ADDR 0x10
 
@@ -12,6 +11,7 @@
 //define autorange values
 #define SATURATION 60000
 #define NOISE_FLOOR 2000
+
 veml7700_mode_t AUTORANGE_SETTINGS[] = {
     {GAIN_2x, ITIME_800MS}, //most sensitive
     {GAIN_2x, ITIME_400MS},
@@ -143,7 +143,6 @@ bool veml7700_read_lux_autorange(veml7700_t *dev, float *lux){
     if(veml7700_autorange_update(dev, counts)){
         uint16_t throwaway;
         sleep_ms(dev->itime_ms);
-        printf("\nUPDATED");
         veml7700_read_counts(dev, &throwaway);
         sleep_ms(1000);
         if(!veml7700_read_counts(dev, &counts)){

@@ -22,8 +22,10 @@ typedef enum{ //integration time
 typedef struct { //veml struct
     i2c_inst_t *port;
     uint8_t addr;
+
     veml7700_gain_t gain;
     veml7700_itime_t itime_ms;
+    
 } veml7700_t;
 
 typedef struct { //holds gain and integration time

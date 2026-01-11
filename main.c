@@ -30,6 +30,7 @@ REMINDERS:
 #include "i2c_bus.h"
 #include "aht20.h"
 #include "veml7700.h"
+#include "ssd1306.h"
 
 //default i2c settings
 #define I2C_PORT i2c0
@@ -50,6 +51,7 @@ static const i2c_bus_t BUS0 = {
 //declare sensors
 aht20_t aht;
 veml7700_t veml;
+ssd1306_t oled;
 
 int main() {
     stdio_init_all();
@@ -60,12 +62,15 @@ int main() {
     int num_devices = i2c_bus_scan(&BUS0); //make sure there's devices on the bus
     if(num_devices == 0){printf("No devices found"); exit(1);}
 
-    //init/config sensors
+    //init and config sensors, wifi, screen
     aht20_init(&aht, BUS0.port);
+
     veml7700_init(&veml, BUS0.port);
     if(!veml7700_config(&veml, GAIN_1x, ITIME_100MS)){
         printf("VEML7700 config failed");
     }
+
+    printf("%d", ssd1306_init(&oled, BUS0.port, SSD1306_ADDR_0x3C));
 
     if (cyw43_arch_init() != 0) {
         // WiFi chip init failed -> LED control won't work
@@ -74,6 +79,32 @@ int main() {
     }
 
     while (true) {
+
+        
+        
+        //--------- OLED TEST CODE ---------
+
+        
+        ssd1306_clear_buffer(&oled);
+        ssd1306_show(&oled);
+        for (int i = 0; i < 64; i++) {
+            ssd1306_draw_pixel(&oled, i, i, true);
+            ssd1306_show(&oled);
+        }
+        ssd1306_clear_buffer(&oled);
+        ssd1306_show(&oled);
+        for (int i = 0; i < 64; i++) {
+            ssd1306_draw_pixel(&oled, 64-i, 64-i, true);
+            ssd1306_show(&oled);
+        }
+        
+        
+
+        //------------------------------------
+        
+
+
+        /*
         //------- VEML7700 TEST CODE --------
 
         uint16_t raw_counts;
@@ -95,7 +126,7 @@ int main() {
         sleep_ms(1000);
 
         //-----------------------------------
-
+        */
 
 
         /*
