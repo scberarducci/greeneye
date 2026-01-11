@@ -56,4 +56,8 @@ bool ssd1306_show(ssd1306_t *dev);
 
 void ssd1306_draw_pixel(ssd1306_t *dev, int x, int y, bool on);
 
-void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int rows, int cols, int scale);
+void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int rows, int cols);
+
+void ssd1306_draw_ascii(ssd1306_t *dev, int x, int y, char c, int scale);
+
+void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale);

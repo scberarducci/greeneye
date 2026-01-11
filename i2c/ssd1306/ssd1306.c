@@ -1,5 +1,6 @@
 #include "ssd1306.h"
 #include <string.h>
+#include "font_table.h"
 
 //screen control codes
 #define COMMAND 0x00 //control byte; tells device next info is command info
@@ -121,7 +122,7 @@ void ssd1306_draw_pixel(ssd1306_t *dev, int x, int y, bool on){
 }
 
 //helper function to write a letter to the screen
-void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int rows, int cols, int scale)
+void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int rows, int cols)
 {
     for (int row = 0; row < rows; row++) {
         uint8_t bits = c[row];
@@ -129,9 +130,51 @@ void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int row
         for (int col = 0; col < cols; col++) {
             bool pixel_on = (bits >> col) & 1u;
             if (pixel_on) {
-                ssd1306_draw_pixel(dev, x + col * scale, y + row * scale, true);
+                ssd1306_draw_pixel(dev, x + col, y + row, true);
             }
         }
+    }
+}
+
+void ssd1306_draw_ascii(ssd1306_t *dev, int x, int y, char c, int scale){
+    if ((unsigned char)c < 0x20 || (unsigned char)c > 0x7F) c = '?'; //if not in table, make ?
+    const uint8_t *target = BASIC_ASCII[(uint8_t)c - 0x20]; //select target char from table
+
+    for (int col = 0; col < 5; col++) {
+        uint8_t bits = target[col];
+
+        for (int row = 0; row < 7; row++) {
+            bool on = (bits >> row) & 1u;
+            if (!on) continue;
+
+            for (int dy = 0; dy < scale; dy++) { //if scale bigger than 1, need to fill gaps
+                for (int dx = 0; dx < scale; dx++) {
+                    ssd1306_draw_pixel(dev, x + col * scale + dx, y + row * scale + dy, true);
+                }
+            }
+        }
+    }
+}
+
+void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale)
+{
+    const int char_w = 5 * scale; //width of each char
+    const int char_h = 7 * scale; //height of each char
+    const int spacing = 1 * scale; //space between chars
+
+    int cursor = x;
+    for (const char *p = s; *p; p++) {
+        if (cursor + char_w > DISPLAY_WIDTH) {
+            cursor = x;
+            y += char_h + spacing;
+        }
+        if (*p == '\n') {
+            cursor = x;        //wrap if char is newline
+            y += char_h + spacing;
+            continue;
+        }
+        ssd1306_draw_ascii(dev, cursor, y, *p, scale);
+        cursor += char_w + spacing;
     }
 }
 

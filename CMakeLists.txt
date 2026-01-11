@@ -22,6 +22,7 @@ add_executable(${TARGET_NAME}
     i2c/sensors/aht20/aht20.c
     i2c/sensors/veml7700/veml7700.c
     i2c/ssd1306/ssd1306.c
+    oled_text/font_table.c
 )
 
 target_link_libraries(${TARGET_NAME} 
@@ -35,6 +36,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/aht20
     ${CMAKE_CURRENT_LIST_DIR}/i2c/sensors/veml7700
     ${CMAKE_CURRENT_LIST_DIR}/i2c/ssd1306
+    ${CMAKE_CURRENT_LIST_DIR}/oled_text
 )
 
 pico_enable_stdio_usb(${TARGET_NAME} 1)

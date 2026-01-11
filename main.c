@@ -78,10 +78,21 @@ int main() {
         exit(1);
     }
 
+    ssd1306_draw_string(&oled, 8, 0, "SCORE:4/8", 2);
+    ssd1306_draw_string(&oled, 24,24, "Too humid", 1);
+    ssd1306_draw_string(&oled, 24,34, "Too hot", 1);
+    ssd1306_draw_string(&oled, 24,44, "Too dark", 1);
+    ssd1306_show(&oled);
+
     while (true) {
 
+        //-------- TEXT TEST CODE ---------
+
         
+
+        //---------------------------------
         
+        /*
         //--------- OLED TEST CODE ---------
 
         
@@ -98,10 +109,8 @@ int main() {
             ssd1306_show(&oled);
         }
         
-        
-
         //------------------------------------
-        
+        */
 
 
         /*
