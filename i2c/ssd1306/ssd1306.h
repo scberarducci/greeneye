@@ -21,6 +21,10 @@
 #define SSD1306_ADDR_0x3C 0x3C
 #define SSD1306_ADDR_0x3D 0x3D
 
+//end behavior definitions for string writing
+#define WRAP 0
+#define TRUNCATE 1
+
 //types of addressing modes
 typedef enum {
   HORIZONTAL = 0,
@@ -60,4 +64,4 @@ void ssd1306_draw_glyph(ssd1306_t *dev, int x, int y, const uint8_t c[], int row
 
 void ssd1306_draw_ascii(ssd1306_t *dev, int x, int y, char c, int scale);
 
-void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale);
+void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale, int endbehavior);

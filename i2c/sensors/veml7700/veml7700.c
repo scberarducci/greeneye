@@ -5,8 +5,8 @@
 #define VEML7700_ADDR 0x10
 
 //to later clear gain and itime config bits before writing new ones
-#define GAIN_MASK (3<<11)
-#define ITIME_MASK (15<<11)
+#define GAIN_MASK (3u<<11)
+#define ITIME_MASK (15u<<6)
 
 //define autorange values
 #define SATURATION 60000
@@ -94,11 +94,21 @@ static float veml7700_lux_per_count(const veml7700_t *dev){
     float gain_val, itime_val = (dev->itime_ms);
     if (itime_val == 0) {return 0.0f;}
     switch(dev->gain){
-        case GAIN_1x: gain_val = 1.0f;
-        case GAIN_2x: gain_val = 2.0f;
-        case GAIN_1_04x: gain_val = 0.25f;
-        case GAIN_1_08x: gain_val = 0.125f;
-        default: gain_val = 1.0f;
+        case GAIN_1x: 
+            gain_val = 1.0f;
+            break;
+        case GAIN_2x: 
+            gain_val = 2.0f;
+            break;
+        case GAIN_1_04x: 
+            gain_val = 0.25f;
+            break;
+        case GAIN_1_08x: 
+            gain_val = 0.125f;
+            break;
+        default: 
+            gain_val = 1.0f;
+            break;
     }
     //reference from datasheet: 0.0042 lux/count at gain = 2x, itime = 800ms
     return 0.0042f * (800.0f / itime_val) * (2.0f / gain_val);
@@ -144,7 +154,6 @@ bool veml7700_read_lux_autorange(veml7700_t *dev, float *lux){
         uint16_t throwaway;
         sleep_ms(dev->itime_ms);
         veml7700_read_counts(dev, &throwaway);
-        sleep_ms(1000);
         if(!veml7700_read_counts(dev, &counts)){
             return false;
         }

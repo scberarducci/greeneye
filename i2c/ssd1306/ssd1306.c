@@ -156,7 +156,7 @@ void ssd1306_draw_ascii(ssd1306_t *dev, int x, int y, char c, int scale){
     }
 }
 
-void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale)
+void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale, int endbehavior)
 {
     const int char_w = 5 * scale; //width of each char
     const int char_h = 7 * scale; //height of each char
@@ -165,8 +165,13 @@ void ssd1306_draw_string(ssd1306_t *dev, int x, int y, const char *s, int scale)
     int cursor = x;
     for (const char *p = s; *p; p++) {
         if (cursor + char_w > DISPLAY_WIDTH) {
-            cursor = x;
-            y += char_h + spacing;
+            if(endbehavior == WRAP){
+                cursor = x;
+                y += char_h + spacing;
+            }
+            else if (endbehavior == TRUNCATE){
+                break;
+            }
         }
         if (*p == '\n') {
             cursor = x;        //wrap if char is newline

@@ -2,10 +2,10 @@
 ----------------------------------------------------
 File: GREENEYE MAIN
 Author: Sara Berarducci
-Date: 01/07/2026
+Date: 01/12/2026
 Description: Plant-monitoring embedded systems project
 
-Last updated: 1/07/2026
+Last updated: 1/12/2026 (INACCURATE IN SOME GIT PUSHES)
 
 ----------------------------------------------------
 REMINDERS:
@@ -73,22 +73,95 @@ int main() {
     printf("%d", ssd1306_init(&oled, BUS0.port, SSD1306_ADDR_0x3C));
 
     if (cyw43_arch_init() != 0) {
-        // WiFi chip init failed -> LED control won't work
+        // WiFi chip init failed -> LED control, bluetooth won't work
         printf("Wifi chip init failed");
         exit(1);
     }
 
-    ssd1306_draw_string(&oled, 8, 0, "SCORE:4/8", 2);
-    ssd1306_draw_string(&oled, 24,24, "Too humid", 1);
-    ssd1306_draw_string(&oled, 24,34, "Too hot", 1);
-    ssd1306_draw_string(&oled, 24,44, "Too dark", 1);
-    ssd1306_show(&oled);
-
     while (true) {
 
-        //-------- TEXT TEST CODE ---------
+        char *plantname = "PLANTNAME";
 
+        //------- VEML7700 CODE --------
+
+        uint16_t raw_counts;
+        char luxstr[32];
+        if(veml7700_read_counts(&veml, &raw_counts)){
+            printf("\nRaw: %u", raw_counts);
+        }
+        else{
+            printf("\nVEML7700 count read failed");
+        }
+
+        float lux;
+        if(veml7700_read_lux_autorange(&veml, &lux)){
+            printf("\nLux: %f", lux);
+
+            /*
+            do some calculations based on plant preset here
+            determine qualitative test for string
+            */
+
+            snprintf(luxstr, sizeof(luxstr), "Too dark: %.0f lx", lux);
+        }
+        else{
+            printf("\nVEML7700 lux read failed");
+            snprintf(luxstr, sizeof(luxstr), "LUX READ ERR", lux);
+        }
+
+        //-----------------------------------
         
+        
+        //--------- AHT20 CODE ---------
+
+        float temp, humidity;
+        char tempstr[32], humstr[32];
+
+        if (aht20_read(&aht, &temp, &humidity)) {
+            printf("Temp: %.1f C   RH: %.1f %%\n", temp, humidity);
+
+            /*
+            do some calculations based on plant preset here
+            determine qualitative text for strings
+            */
+           
+            snprintf(tempstr, sizeof(tempstr), "Too cold: %.1f C", temp);
+            snprintf(humstr, sizeof(humstr), "Too humid: %.1f%%", humidity);
+
+        } else {
+            printf("AHT20 read failed\n");
+            snprintf(tempstr, sizeof(tempstr), "HUM/TEMP ERR");
+            snprintf(humstr, sizeof(humstr), "HUM/TEMP ERR");
+        }
+
+        //-----------------------------------
+        
+
+        //-------- CALCULATE SCORE ----------
+
+        char scorestr[32];
+        int score;
+
+        /*
+        do some math here with temp, humidity, lux, and plant presets to determine an /10 score
+        */
+
+       score = 4; //placeholder value
+       snprintf(scorestr, sizeof(scorestr), "Score: %d/10", score);
+
+       //----------------------------------
+
+
+        //-------- PRINT TO OLED ---------
+
+        sleep_ms(1000);
+        ssd1306_clear_buffer(&oled);
+        ssd1306_draw_string(&oled, 0, 0, plantname, 2, TRUNCATE);
+        ssd1306_draw_string(&oled, 0,20, humstr, 1, TRUNCATE);
+        ssd1306_draw_string(&oled, 0,30, tempstr, 1, TRUNCATE);
+        ssd1306_draw_string(&oled, 0,40, luxstr, 1, TRUNCATE);
+        ssd1306_draw_string(&oled, 0, 50, scorestr, 1, TRUNCATE);
+        ssd1306_show(&oled);
 
         //---------------------------------
         
@@ -112,46 +185,5 @@ int main() {
         //------------------------------------
         */
 
-
-        /*
-        //------- VEML7700 TEST CODE --------
-
-        uint16_t raw_counts;
-        if(veml7700_read_counts(&veml, &raw_counts)){
-            printf("\nRaw: %u", raw_counts);
-        }
-        else{
-            printf("\nVEML7700 count read failed");
-        }
-
-        float lux;
-        if(veml7700_read_lux_autorange(&veml, &lux)){
-            printf("\nLux: %f", lux);
-        }
-        else{
-            printf("\nVEML7700 lux read failed");
-        }
-
-        sleep_ms(1000);
-
-        //-----------------------------------
-        */
-
-
-        /*
-        //--------- AHT20 TEST CODE ---------
-
-        float temp, humidity;
-
-        if (aht20_read(&aht, &temp, &humidity)) {
-            printf("Temp: %.1f C   RH: %.1f %%\n", temp, humidity);
-        } else {
-            printf("AHT20 read failed\n");
-        }
-
-        sleep_ms(1000);
-
-        //-----------------------------------
-        */
     }
 }
