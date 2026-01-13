@@ -18,6 +18,7 @@ void pec11r_init(pec11r_t *dev, uint32_t gpio_a, uint32_t gpio_b, uint32_t gpio_
     if (gpio_sw != UINT32_MAX) { //button might not be used
         gpio_init(gpio_sw);
         gpio_set_dir(gpio_sw, GPIO_IN);
+        
         gpio_pull_up(gpio_sw);
 
         dev->sw_prev = gpio_get(gpio_sw); // raw switch value
@@ -43,6 +44,9 @@ uint8_t pec11r_read_ab(const pec11r_t *dev){
 }
 
 //read switch value
+//BEHAVIOR:
+//- returns true once per physical press (debounced)
+//- button active-low with internal pull-up
 bool pec11r_sw_pressed(pec11r_t *dev) {
     if (dev->gpio_sw == UINT32_MAX) { return false; }
 
