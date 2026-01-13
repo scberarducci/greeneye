@@ -2,7 +2,7 @@
 ----------------------------------------------------
 File: GREENEYE MAIN
 Author: Sara Berarducci
-Date: 01/12/2026
+Start Date: 01/07/2026
 Description: Plant-monitoring embedded systems project
 
 Last updated: 1/12/2026 (INACCURATE IN SOME GIT PUSHES)
@@ -31,6 +31,7 @@ REMINDERS:
 #include "aht20.h"
 #include "veml7700.h"
 #include "ssd1306.h"
+#include "pec11r.h"
 
 //default i2c settings
 #define I2C_PORT i2c0
@@ -52,6 +53,7 @@ static const i2c_bus_t BUS0 = {
 aht20_t aht;
 veml7700_t veml;
 ssd1306_t oled;
+pec11r_t enc;
 
 int main() {
     stdio_init_all();
@@ -62,7 +64,7 @@ int main() {
     int num_devices = i2c_bus_scan(&BUS0); //make sure there's devices on the bus
     if(num_devices == 0){printf("No devices found"); exit(1);}
 
-    //init and config sensors, wifi, screen
+    //init and config sensors, wifi, screen, encoder
     aht20_init(&aht, BUS0.port);
 
     veml7700_init(&veml, BUS0.port);
@@ -78,7 +80,27 @@ int main() {
         exit(1);
     }
 
+    pec11r_init(&enc, 6, 7, 8); //gpios 6,7 for rotary, gpio 8 for switch
+    int enc_pos = 0;
+
+
     while (true) {
+
+        //------ ENCODER TEST CODE -------
+
+        int click = pec11r_detent_poll(&enc);
+        enc_pos += click;
+        if(click!=0) printf("pos=%d\n", enc_pos);
+
+        bool pressed = pec11r_sw_pressed(&enc);
+        if(pressed) printf("button pressed");
+        sleep_ms(1);
+
+        //--------------------------------
+
+
+        /*
+        //--------- MAIN CODE ----------
 
         char *plantname = "PLANTNAME";
 
@@ -97,10 +119,10 @@ int main() {
         if(veml7700_read_lux_autorange(&veml, &lux)){
             printf("\nLux: %f", lux);
 
-            /*
-            do some calculations based on plant preset here
-            determine qualitative test for string
-            */
+            
+            //do some calculations based on plant preset here
+            //determine qualitative test for string
+            
 
             snprintf(luxstr, sizeof(luxstr), "Too dark: %.0f lx", lux);
         }
@@ -118,12 +140,12 @@ int main() {
         char tempstr[32], humstr[32];
 
         if (aht20_read(&aht, &temp, &humidity)) {
-            printf("Temp: %.1f C   RH: %.1f %%\n", temp, humidity);
+            printf("\nTemp: %.1f C   RH: %.1f %%\n", temp, humidity);
 
-            /*
-            do some calculations based on plant preset here
-            determine qualitative text for strings
-            */
+            
+            //do some calculations based on plant preset here
+            //determine qualitative text for strings
+            
            
             snprintf(tempstr, sizeof(tempstr), "Too cold: %.1f C", temp);
             snprintf(humstr, sizeof(humstr), "Too humid: %.1f%%", humidity);
@@ -142,9 +164,9 @@ int main() {
         char scorestr[32];
         int score;
 
-        /*
-        do some math here with temp, humidity, lux, and plant presets to determine an /10 score
-        */
+        
+        //do some math here with temp, humidity, lux, and plant presets to determine an /10 score
+        
 
        score = 4; //placeholder value
        snprintf(scorestr, sizeof(scorestr), "Score: %d/10", score);
@@ -165,7 +187,15 @@ int main() {
 
         //---------------------------------
         
-        /*
+
+        //---------------------------------
+        */
+
+    }
+}
+
+
+/*
         //--------- OLED TEST CODE ---------
 
         
@@ -184,6 +214,3 @@ int main() {
         
         //------------------------------------
         */
-
-    }
-}
