@@ -5,7 +5,7 @@ Author: Sara Berarducci
 Start Date: 01/07/2026
 Description: Plant-monitoring embedded systems project
 
-Last updated: 1/12/2026 (INACCURATE IN SOME GIT PUSHES)
+Last updated: 1/15/2026
 
 ----------------------------------------------------
 REMINDERS:
@@ -25,6 +25,8 @@ REMINDERS:
 //hardware headers (i2c, gpios)
 #include "hardware/i2c.h"
 #include "hardware/gpio.h"
+#include "hardware/pio.h"
+#include "ws2812.h"
 
 //drivers and custom modules
 #include "i2c_bus.h"
@@ -38,8 +40,16 @@ REMINDERS:
 #define SDA_PIN  4
 #define SCL_PIN  5
 
-//i2c addresses
-#define AHT20_ADDR 0x38
+//default pio settings
+#define WS2812_PIN 9
+#define WS2812_NUM_PIXELS 8
+#define WS2812_SM 0
+
+//define LED strip used colors
+#define RED {255,0,0}
+#define YELLOW {255,255,0}
+#define GREEN {0,255,0}
+#define OFF {0,0,0}
 
 //declare i2c bus
 static const i2c_bus_t BUS0 = {
@@ -49,13 +59,15 @@ static const i2c_bus_t BUS0 = {
     .freq_hz = 100 * 1000
 };
 
-//declare sensors
+//declare peripherals
 aht20_t aht;
 veml7700_t veml;
 ssd1306_t oled;
 pec11r_t enc;
+led_strip_t strip;
 
 int main() {
+
     stdio_init_all();
     sleep_ms(2000);
 
@@ -77,29 +89,18 @@ int main() {
     if (cyw43_arch_init() != 0) {
         // WiFi chip init failed -> LED control, bluetooth won't work
         printf("Wifi chip init failed");
-        exit(1);
     }
 
     pec11r_init(&enc, 6, 7, 8); //gpios 6,7 for rotary, gpio 8 for switch
     int enc_pos = 0;
 
+    if(!led_strip_init(&strip, pio0, WS2812_SM, WS2812_PIN, WS2812_NUM_PIXELS)){
+        printf("LED strip (PIO) init failed");
+    }
+
 
     while (true) {
-
-        //------ ENCODER TEST CODE -------
-
-        int click = pec11r_detent_poll(&enc);
-        enc_pos += click;
-        if(click!=0) printf("pos=%d\n", enc_pos);
-
-        bool pressed = pec11r_sw_pressed(&enc);
-        if(pressed) printf("button pressed");
-        sleep_ms(1);
-
-        //--------------------------------
-
-
-        /*
+        
         //--------- MAIN CODE ----------
 
         char *plantname = "PLANTNAME";
@@ -189,13 +190,15 @@ int main() {
         
 
         //---------------------------------
-        */
+        
 
     }
 }
 
 
 /*
+ARCHIVED TEST CODE:
+
         //--------- OLED TEST CODE ---------
 
         
@@ -213,4 +216,26 @@ int main() {
         }
         
         //------------------------------------
-        */
+
+        //------ ENCODER TEST CODE -------
+
+        int click = pec11r_detent_poll(&enc);
+        enc_pos += click;
+        if(click!=0) printf("pos=%d\n", enc_pos);
+
+        bool pressed = pec11r_sw_pressed(&enc);
+        if(pressed) printf("button pressed");
+        sleep_ms(1);
+
+        //--------------------------------
+
+        //-------- LED STRIP TEST CODE ----------
+
+        led_strip_clear(&strip);
+        uint32_t buf[][3] = {OFF, GREEN, GREEN, YELLOW, YELLOW, YELLOW, RED, RED};
+        led_strip_set_buffer_rgb(&strip, buf,8);
+        led_strip_show(&strip);
+
+        //---------------------------------------
+        
+*/

@@ -24,6 +24,11 @@ add_executable(${TARGET_NAME}
     i2c/ssd1306/ssd1306.c
     oled_text/font_table.c
     encoder/pec11r.c
+    led/ws2812.c
+)
+
+pico_generate_pio_header(greeneye-main
+    ${CMAKE_CURRENT_LIST_DIR}/led/ws2812.pio
 )
 
 target_link_libraries(${TARGET_NAME} 
@@ -39,6 +44,7 @@ target_include_directories(${TARGET_NAME} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/i2c/ssd1306
     ${CMAKE_CURRENT_LIST_DIR}/oled_text
     ${CMAKE_CURRENT_LIST_DIR}/encoder
+    ${CMAKE_CURRENT_LIST_DIR}/led
 )
 
 pico_enable_stdio_usb(${TARGET_NAME} 1)

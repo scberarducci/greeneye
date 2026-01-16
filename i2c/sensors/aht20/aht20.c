@@ -3,6 +3,7 @@
 #include "pico/stdlib.h" //for timing
 
 #define AHT20_ADDR 0x38
+
 static const uint8_t AHT20_TRIGGER[3] = {0xAC, 0x33, 0x00};
 
 void aht20_init(aht20_t *dev, i2c_inst_t *port){

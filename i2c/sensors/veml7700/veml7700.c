@@ -12,6 +12,7 @@
 #define SATURATION 60000
 #define NOISE_FLOOR 2000
 
+//define range of settings for auto adjustment 
 veml7700_mode_t AUTORANGE_SETTINGS[] = {
     {GAIN_2x, ITIME_800MS}, //most sensitive
     {GAIN_2x, ITIME_400MS},
@@ -28,7 +29,7 @@ veml7700_mode_t AUTORANGE_SETTINGS[] = {
 #define VEML7700_CONFIG_REG 0x00
 #define VEML7700_OUTPUT_REG 0x04
 
-//helpers to map gain settings to bits foro configuration
+//helpers to map gain settings to bits for configuration
 static uint16_t gain_to_bits(veml7700_gain_t gain){
     switch(gain){
         case GAIN_1x: return (0<<11);
